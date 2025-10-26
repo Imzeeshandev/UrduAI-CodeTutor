@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Urdu AI Code Tutor</title>
+  <style>
+    body { background: #111; color: #0f0; font-family: Arial; padding: 20px; text-align: center; }
+    h1 { color: #0f0; }
+    textarea { width: 100%; height: 150px; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 8px; padding: 10px; font-size: 16px; }
+    button { background: #0f0; color: #000; padding: 12px 30px; margin: 15px 0; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; }
+    #output { margin-top: 20px; color: #fff; background: #222; padding: 15px; border-radius: 8px; text-align: right; direction: rtl; }
+    pre { background: #000; padding: 10px; border-radius: 5px; color: #0f0; text-align: left; direction: ltr; }
+  </style>
+</head>
+<body>
+  <h1>اردو AI کوڈ ٹیوٹر</h1>
+  <textarea id="code" placeholder="یہاں کوڈ پیسٹ کرو..."></textarea>
+  <button onclick="fixCode()">فکس اور سمجھاؤ</button>
+  <div id="output"></div>
+
+  <!-- PRO SUBSCRIPTION POPUP -->
+  <div id="proPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; text-align:center; padding:20px;">
+    <div style="background:#222; color:#0f0; padding:20px; border-radius:15px; margin-top:50px; border:2px solid #0f0;">
+      <h2>پرو ورژن انلاک کرو!</h2>
+      <p>₹99/ماہ</p>
+      <ul style="text-align:right; direction:rtl;">
+        <li>لامحدود کوڈ فکس</li>
+        <li>آف لائن استعمال</li>
+        <li>کوئی ایڈز نہیں</li>
+        <li>نئے فیچرز پہلے</li>
+      </ul>
+      <button onclick="unlockPro()" style="background:#0f0; color:#000; padding:12px 30px; margin:10px; border:none; border-radius:8px; font-weight:bold;">ابھی خریدیں</button>
+      <button onclick="closePro()" style="background:#555; color:#fff; padding:10px 20px; margin:10px; border:none; border-radius:8px;">بعد میں</button>
+    </div>
+  </div>
+
+  <script>
+    // Auto-Update from GitHub
+    const CLOUD_CODE_URL = "https://raw.githubusercontent.com/Imzeeshandev/UrduAI-CodeTutor/main/app.html";
+    fetch(CLOUD_CODE_URL + "?t=" + Date.now())
+      .then(r => r.text())
+      .then(cloudCode => {
+        const localCode = document.documentElement.outerHTML;
+        if (cloudCode !== localCode && cloudCode.includes("Urdu AI Code Tutor")) {
+          if (confirm("نئی اپ ڈیٹ دستیاب ہے! ابھی اپ ڈیٹ کریں؟")) {
+            document.open(); document.write(cloudCode); document.close();
+          }
+        }
+      }).catch(() => {});
+
+    // Pro System
+    let isPro = localStorage.getItem("isPro") === "true";
+    let useCount = parseInt(localStorage.getItem("useCount") || "0");
+    useCount++;
+    localStorage.setItem("useCount", useCount);
+    if (useCount >= 3 && !isPro) {
+      setTimeout(() => document.getElementById("proPopup").style.display = "block", 2000);
+    }
+
+    function unlockPro() {
+      alert("پرو ورژن انلاک ہو گیا! ₹99 کٹ گئے۔");
+      localStorage.setItem("isPro", "true");
+      document.getElementById("proPopup").style.display = "none";
+      location.reload();
+    }
+    function closePro() { document.getElementById("proPopup").style.display = "none"; }
+
+    function fixCode() {
+      if (!isPro && useCount > 5) {
+        document.getElementById("output").innerHTML = "<p style='color:red;'>مفت ورژن میں صرف 5 کوڈ فکس! پرو ورژن خریدیں۔</p>";
+        return;
+      }
+      let code = document.getElementById("code").value.trim();
+      let fixed = code;
+      let explain = "";
+      if (!code) explain = "کوئی کوڈ نہیں ملا!";
+      else if (code.includes('print(') && !code.includes(')')) { fixed = code + ')'; explain = "بریکٹ بند نہیں تھی!"; }
+      else if (code.includes('"') && (code.match(/"/g) || []).length % 2 !== 0) { fixed = code + '"'; explain = "کوٹیشن بند نہیں تھی!"; }
+      else explain = "کوڈ ٹھیک ہے! چلے گا۔";
+      document.getElementById("output").innerHTML = 
+        `<p><b>درست کوڈ:</b></p><pre>${fixed}</pre><p><b>تشریح:</b> ${explain}</p>`;
+    }
+  </script>
+</body>
+  </html>
